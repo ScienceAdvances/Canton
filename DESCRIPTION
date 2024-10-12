@@ -4,7 +4,7 @@ Version: 0.0.1
 Authors@R: 
     person("Vik", "Wang", , "yehior@qq.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2254-1871"))
-Description: What the package does (one paragraph).
+Description: Library Packages Without Starting Messages.
 License: GPL-3
 URL: https://github.com/ScienceAdvances/using
 Encoding: UTF-8
