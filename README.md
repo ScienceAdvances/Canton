@@ -28,6 +28,4 @@ When loading packages by `using` , a warning message in cyan color will show as 
 ``` r
 using(tidyverse, data.table, Seurat, DummyA, DummyB)
 ```
-Warning message:   
-In using(tidyverse, data.table, Seurat, DummyA, DummyB) :    
-<p style="color: cyan;">Failed to load:  DummyA, DummyB</p>
+![](image.png)
