@@ -1,10 +1,10 @@
-#' Library multiple packages
+#' Load Multiple Packages Without Starting Messages
 #'
-#' Library multiple packages without starting messages.
+#' Load Multiple Packages Without Starting Messages
 #'
-#' @param ... package names
+#' @param ... multiple package names without double quotation marks and seperated by comma 
 #'
-#' @return nothing.
+#' @return nothing
 #'
 #' @export
 #' @examples

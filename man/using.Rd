@@ -2,18 +2,18 @@
 % Please edit documentation in R/using.R
 \name{using}
 \alias{using}
-\title{Library multiple packages}
+\title{Load Multiple Packages Without Starting Messages}
 \usage{
 using(...)
 }
 \arguments{
-\item{...}{package names}
+\item{...}{multiple package names without double quotation marks and seperated by comma}
 }
 \value{
-nothing.
+nothing
 }
 \description{
-Library multiple packages without starting messages.
+Load Multiple Packages Without Starting Messages
 }
 \examples{
 using(Seurat,tidyverse,magrittr,data.table)
