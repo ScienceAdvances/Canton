@@ -31,6 +31,7 @@ using(tidyverse, data.table, Seurat, DummyA, DummyB)
 ![](image.png)
 
 ## Save ggplot2 object plot
+``` r
 using::using(ggplot2)
 p=ggplot(mpg, aes(cty, hwy)) +
   # to create a scatterplot
@@ -38,3 +39,4 @@ p=ggplot(mpg, aes(cty, hwy)) +
   # to fit and overlay a loess trendline
   geom_smooth(formula = y ~ x, method = "lm")
 using::gs(p outdir = "Result", name = "mpg_point", w = 7, h = 7)
+```
