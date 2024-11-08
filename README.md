@@ -1,13 +1,13 @@
 
-# pak
+# using
 
-> Load Multiple Packages Without Starting Messages at Once
+> Data Analysis Toolkit
 
 <!-- badges: start -->
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/using)](https://cran.r-project.org/package=using)
 <!-- badges: end -->
 
-using loads R packages. It is an alternative to `library()` and `require()`. using is fast, safe and convenient.
+Data Analysis Toolkit
 
 ## Install using from CRAN or github
 
@@ -29,3 +29,12 @@ When loading packages by `using` , a warning message in cyan color will show as 
 using(tidyverse, data.table, Seurat, DummyA, DummyB)
 ```
 ![](image.png)
+
+## Save ggplot2 object plot
+using::using(ggplot2)
+p=ggplot(mpg, aes(cty, hwy)) +
+  # to create a scatterplot
+  geom_point() +
+  # to fit and overlay a loess trendline
+  geom_smooth(formula = y ~ x, method = "lm")
+using::gs(p outdir = "Result", name = "mpg_point", w = 7, h = 7)
