@@ -2,7 +2,7 @@
 % Please edit documentation in R/using.R
 \name{using}
 \alias{using}
-\title{Load Multiple Packages Without Starting Messages}
+\title{Load Multiple Packages Without Starting Messages at Once}
 \usage{
 using(...)
 }
@@ -13,8 +13,8 @@ using(...)
 nothing
 }
 \description{
-Load Multiple Packages Without Starting Messages
+Load Multiple Packages Without Starting Messages at Once
 }
 \examples{
-using(Seurat,tidyverse,magrittr,data.table)
+using(ggplot, magrittr)
 }

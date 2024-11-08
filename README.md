@@ -1,13 +1,13 @@
 
 # pak
 
-> Library Packages Without Starting Messages
+> Load Multiple Packages Without Starting Messages at Once
 
 <!-- badges: start -->
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/using)](https://cran.r-project.org/package=using)
 <!-- badges: end -->
 
- using loads R packages. It is an alternative to `library()` and `require()`. using is fast, safe and convenient.
+using loads R packages. It is an alternative to `library()` and `require()`. using is fast, safe and convenient.
 
 ## Install using from CRAN or github
 

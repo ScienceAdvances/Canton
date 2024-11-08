@@ -1,15 +1,14 @@
-#' Load Multiple Packages Without Starting Messages
+#' Load Multiple Packages Without Starting Messages at Once
 #'
-#' Load Multiple Packages Without Starting Messages
+#' Load Multiple Packages Without Starting Messages at Once
 #'
-#' @param ... multiple package names without double quotation marks and seperated by comma 
+#' @param ... multiple package names without double quotation marks and seperated by comma
 #'
 #' @return nothing
 #'
 #' @export
 #' @examples
-#' using(Seurat,tidyverse,magrittr,data.table)
-
+#' using(ggplot, magrittr)
 using <- function(...) {
     packages <- as.character(match.call(expand.dots = FALSE)[[2]])
 
