@@ -4,14 +4,14 @@
 \alias{gs}
 \title{Save ggplot2 object plot}
 \usage{
-gs(p, outdir = base::getwd(), name = "", w = 7, h = 7)
+gs(p, name = "gplot", outdir = base::getwd(), w = 7, h = 7)
 }
 \arguments{
 \item{p}{ggplot2 object plot}
 
-\item{outdir}{output directory}
-
 \item{name}{output filename}
+
+\item{outdir}{output directory}
 
 \item{w}{width}
 

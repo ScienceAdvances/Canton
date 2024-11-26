@@ -12,8 +12,10 @@ Data Analysis Toolkit
 ## Install using from CRAN or github
 
 ``` r
-install.packages("using")
+install.packages("remotes")
 remotes::install_github("ScienceAdvances/using")
+remotes::inst("ScienceAdvances/using")
+
 ```
 
 ## Use using to load packages
