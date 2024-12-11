@@ -5,20 +5,23 @@
 #' @param p ggplot2 object plot
 #' @param outdir output directory
 #' @param name output filename
+#' @param format output image format, pdf or png or both
 #' @param w width
 #' @param h height
 #' @return nothing
 #'
 #' @export
 #' @examples
-#' gs(p = plot, outdir = "Result", name = "A", w = 7, h = 7)
-
-gs <- function(p, name = "gplot", outdir = base::getwd(), w = 7, h = 7) {
+#' gs(p = plot, outdir = "Result", name = "gplot", w = 9, h = 9)
+gs <- function(p, name = "gplot", outdir = base::getwd(), format = "pdf", w = 9, h = 9) {
     mkdir(outdir)
-    grDevices::pdf(file = base::file.path(outdir, base::paste0(name, ".pdf")), width = w, height = h)
-    invisible(print(p))
-    dev.off()
-    grDevices::png(filename = base::file.path(outdir, base::paste0(name, ".png")),res=300,units='in',bg='white', width = w, height = h)
-    invisible(print(p))
-    dev.off()
+    if ("pdf" %in% format) {
+        grDevices::pdf(file = base::file.path(outdir, base::paste0(name, ".pdf")), width = w, height = h)
+        invisible(print(p))
+        dev.off()
+    } else if ("png" %in% format) {
+        grDevices::png(filename = base::file.path(outdir, base::paste0(name, ".png")), res = 300, units = "in", bg = "white", width = w, height = h)
+        invisible(print(p))
+        dev.off()
+    }
 }

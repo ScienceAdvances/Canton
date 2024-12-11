@@ -4,7 +4,7 @@
 \alias{hue}
 \title{Return a palette}
 \usage{
-hue(name = "NPG")
+hue(name = NULL)
 }
 \arguments{
 \item{name}{pallet name}
@@ -17,4 +17,5 @@ Return a palette
 }
 \examples{
 hue(name = "NPG")
+
 }

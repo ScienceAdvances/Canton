@@ -4,7 +4,7 @@
 \alias{gs}
 \title{Save ggplot2 object plot}
 \usage{
-gs(p, name = "gplot", outdir = base::getwd(), w = 7, h = 7)
+gs(p, name = "gplot", outdir = base::getwd(), format = "pdf", w = 9, h = 9)
 }
 \arguments{
 \item{p}{ggplot2 object plot}
@@ -12,6 +12,8 @@ gs(p, name = "gplot", outdir = base::getwd(), w = 7, h = 7)
 \item{name}{output filename}
 
 \item{outdir}{output directory}
+
+\item{format}{output image format, pdf or png or both}
 
 \item{w}{width}
 
@@ -24,5 +26,5 @@ nothing
 Save ggplot2 object plot
 }
 \examples{
-gs(p = plot, outdir = "Result", name = "A", w = 7, h = 7)
+gs(p = plot, outdir = "Result", name = "gplot", w = 9, h = 9)
 }

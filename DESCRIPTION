@@ -1,6 +1,6 @@
 Package: using
 Title: Data Analysis Toolkit
-Version: 0.0.3
+Version: 0.0.4
 Authors@R: 
     person("Vik", "Wang", , "yehior@qq.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2254-1871"))
