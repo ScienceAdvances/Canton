@@ -16,11 +16,11 @@
 gs <- function(p, name = "gplot", outdir = base::getwd(), format = "pdf", w = 9, h = 9) {
     mkdir(outdir)
     if ("pdf" %in% format) {
-        Cairo::CairoPDF(file = base::file.path(outdir, base::paste0(name, ".pdf")), width = w, height = h)
+        Cairo::CairoPDF(file = base::file.path(outdir, base::paste0(name, ".pdf")), width = w, height = h,family="Arial")
         invisible(print(p))
         dev.off()
     } else if ("png" %in% format) {
-        Cairo::CairoPNG(filename = base::file.path(outdir, base::paste0(name, ".png")), res = 300, units = "in", bg = "white", width = w, height = h)
+        Cairo::CairoPNG(filename = base::file.path(outdir, base::paste0(name, ".png")), res = 300, units = "in", bg = "white", width = w, height = h,family="Arial")
         invisible(print(p))
         dev.off()
     }
