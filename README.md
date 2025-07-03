@@ -9,7 +9,7 @@
 
 Data Analysis Toolkit
 
-## Install using from CRAN or github
+## Install Canton from github
 
 ``` r
 install.packages("remotes")
