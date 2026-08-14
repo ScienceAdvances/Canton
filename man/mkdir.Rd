@@ -2,19 +2,20 @@
 % Please edit documentation in R/mkdir.R
 \name{mkdir}
 \alias{mkdir}
-\title{Make Directory}
+\title{Create directories}
 \usage{
 mkdir(directory)
 }
 \arguments{
-\item{directory}{directory path}
+\item{directory}{One or more directory paths.}
 }
 \value{
-nothing
+Invisibly, normalized directory paths.
 }
 \description{
-Make Directory
+Create one or more directories recursively. Existing directories are left
+unchanged, making the function safe to call repeatedly.
 }
 \examples{
-mkdir(getwd())
+mkdir(file.path(tempdir(), "canton-example"))
 }

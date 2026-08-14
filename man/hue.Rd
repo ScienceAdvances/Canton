@@ -2,20 +2,23 @@
 % Please edit documentation in R/hue.R
 \name{hue}
 \alias{hue}
-\title{Return a palette}
+\title{Return a Canton colour palette}
 \usage{
 hue(name = NULL)
 }
 \arguments{
-\item{name}{pallet name}
+\item{name}{Palette name. Matching is case-insensitive. If \code{NULL}, list
+the available palette names.}
 }
 \value{
-a vector of colors
+A character vector of colours, or invisibly a character vector of available
+palette names when \code{name} is \code{NULL}.
 }
 \description{
-Return a palette
+Return a named colour palette. Call \code{hue()} without a name to list the
+available palettes.
 }
 \examples{
-hue(name = "NPG")
-
+hue("NPG")
+hue("dark2")
 }

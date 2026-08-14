@@ -1,14 +1,12 @@
-#' Print Current Working Directory
+#' Return the current working directory
 #'
-#' Print the full filename of the current working directory.
+#' Return the absolute path of the current working directory.
 #'
-#' @param
-#'
-#' @return a string of current working directory
+#' @return A character scalar containing the current working directory.
 #'
 #' @export
 #' @examples
 #' pwd()
 pwd <- function() {
-    return(base::getwd())
+    base::getwd()
 }

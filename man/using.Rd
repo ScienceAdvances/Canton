@@ -2,19 +2,23 @@
 % Please edit documentation in R/using.R
 \name{using}
 \alias{using}
-\title{Load Multiple Packages Without Starting Messages at Once}
+\title{Load multiple packages quietly}
 \usage{
 using(...)
 }
 \arguments{
-\item{...}{multiple package names without double quotation marks and seperated by comma}
+\item{...}{Package names supplied as bare names, character strings, or
+character vectors.}
 }
 \value{
-nothing
+Invisibly, a named logical vector indicating which packages were loaded
+successfully.
 }
 \description{
-Load Multiple Packages Without Starting Messages at Once
+Attach one or more installed packages while suppressing startup messages.
+Package names may be supplied as bare names, strings, or character vectors.
 }
 \examples{
-using(ggplot, magrittr)
+using(ggplot2)
+using(c("ggplot2", "grid"))
 }

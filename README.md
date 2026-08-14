@@ -1,53 +1,534 @@
-
 # Canton
 
-> Data Analysis Toolkit
+> Consistent fonts and figure export for scientific publication workflows in R
 
-<!-- badges: start -->
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/using)](https://cran.r-project.org/package=using)
-<!-- badges: end -->
+## Overview
 
-Data Analysis Toolkit
+Canton is a small R package for preparing figures for scientific manuscripts.
+It addresses two recurring problems:
 
-## Install Canton from github
+1. text and font settings are inconsistent across R graphics systems; and
+2. journals request figures in different combinations of physical size,
+   resolution, and file format.
 
-``` r
+R does not have one universal plot object. A `ggplot2` plot, a grid grob,
+`pheatmap` and `ComplexHeatmap` results, and a base R plot are represented and
+rendered differently. Canton provides a single `imagesave()` interface that
+detects common plot types and selects an appropriate rendering strategy. It
+also provides checked font configuration, reusable export presets, a
+publication-oriented ggplot2 theme, and colour scales.
+
+The package does not submit files, contact journals, install system fonts, or
+silently download external resources. Output is written only when the user
+explicitly calls a saving function and selects an output directory.
+
+## Main functionality
+
+| Function | Purpose |
+|---|---|
+| `imagesave()` | Save supported R plots to one or more formats |
+| `figure_preset()` | Create reusable size, resolution, and format settings |
+| `setfont()` | Check and configure a plotting font for the current R session |
+| `fontcheck()` | Test whether a font family is available |
+| `fontlist()` | List or search available system font families |
+| `resetfont()` | Restore settings saved by the first `setfont()` call |
+| `theme_canton()` | Apply a compact publication-oriented ggplot2 theme |
+| `scale_*_canton_d()` | Apply Canton palettes to discrete ggplot2 scales |
+| `scale_*_canton_c()` | Apply Canton palettes to continuous ggplot2 scales |
+| `hue()` | Return a Canton colour palette |
+| `using()` | Attach multiple installed packages quietly |
+| `mkdir()` | Create output directories recursively and idempotently |
+| `pwd()` | Return the current working directory |
+
+## Installation
+
+Install the development version from GitHub:
+
+```r
 install.packages("remotes")
 remotes::install_github("ScienceAdvances/Canton")
 ```
 
-## Use using to load packages
-load installed packages without starting messages
+Load the package:
 
-``` r
+```r
 library(Canton)
-using(tidyverse, data.table, Seurat)
-```
-Load installed and uninstalled packages.   
-DummyA and DummyB did not exist, so we did not install them.   
-When loading packages by `using` , a warning message in cyan color will show as below.
-
-``` r
-using(tidyverse, data.table, Seurat, DummyA, DummyB)
 ```
 
-![](image.png)
+## A unified figure-saving interface
 
-## Save ggplot2 object plot
-``` r
-Canton::using(ggplot2)
-p=ggplot(mpg, aes(cty, hwy)) +
-  # to create a scatterplot
-  geom_point() +
-  # to fit and overlay a loess trendline
-  geom_smooth(formula = y ~ x, method = "lm")
-Canton::gs(p, outdir = "Result", name = "mpg_point", w = 7, h = 7)
+### Why type-specific rendering is necessary
+
+`imagesave()` does not coerce every input into a ggplot object. Instead, it
+dispatches internally according to the input type:
+
+| Input | Rendering strategy |
+|---|---|
+| `ggplot` | Saved with `ggplot2::ggsave()` |
+| `pheatmap` | Extracts and saves the returned `$gtable` |
+| ComplexHeatmap `Heatmap` or `HeatmapList` | Drawn with `ComplexHeatmap::draw()` on each output device |
+| `grob`, `gTree`, `gtable`, or `gList` | Saved as a grid graphical object |
+| `recordedplot` | Replayed with `grDevices::replayPlot()` |
+| `trellis` | Printed on a format-specific graphics device |
+| zero-argument function | Executed on each requested graphics device |
+| `NULL` | Captures the current plot with `grDevices::recordPlot()` |
+
+This approach preserves the intended rendering method of each graphics system.
+Unsupported objects produce an informative error rather than being passed
+implicitly to `plot()`.
+
+### Supported output formats
+
+`imagesave()` supports:
+
+- PDF (`"pdf"`);
+- PNG (`"png"`);
+- JPEG (`"jpg"` or `"jpeg"`); and
+- TIFF (`"tif"` or `"tiff"`).
+
+One call can create one file or several formats. Each format is rendered
+directly from the original plot; Canton does not convert a previously created
+raster image into PDF.
+
+```r
+library(ggplot2)
+
+p <- ggplot(mtcars, aes(mpg, wt, colour = factor(cyl))) +
+  geom_point(size = 2.5) +
+  labs(
+    x = "Fuel economy (mpg)",
+    y = "Weight (1000 lbs)",
+    colour = "Cylinders"
+  )
+
+paths <- imagesave(
+  p,
+  name = "figure_1",
+  outdir = file.path(tempdir(), "canton-figures"),
+  format = c("png", "pdf", "tiff"),
+  width = 7,
+  height = 5,
+  units = "in",
+  dpi = 300
+)
+
+paths
 ```
 
-## Return a palette
-``` r
-Canton::hue(name = "NPG")
-#  [1] "#E54B34" "#4CBAD4" "#009F86" "#3B5387" "#F29A7F" "#8491B3" "#91D1C1" "#DC0000" "#7E6047" "#CCCCCC" "#BC8B83" "#33ADAD" "#347988" "#9F7685" "#C1969A" "#8BB0BB" "#CE8662" "#B04929" "#A59487" "#E3907E" "#D46F5B" "#41B4C1"
-# [23] "#278C87" "#726486" "#DA988C" "#88A0B7" "#B9AC91" "#C63517" "#927A66" "#DBAEA4" "#97A4AB" "#21A69A" "#3A6688" "#C98882" "#A593A7" "#8EC0BE" "#D85935" "#985738" "#B9AFA9" "#E67059" "#E5BFB9" "#B2CED4" "#779F99" "#747A87"
-# [45] "#F2DCD5" "#A7ABB3" "#C1D1CD" "#DCA5A5" "#7E7770" "#CCCCCC"
+The return value is an invisible named character vector containing the complete
+paths of the generated files. Missing output directories are created
+recursively. Existing files are overwritten by default; use
+`overwrite = FALSE` to prevent replacement.
+
+### Saving ggplot2 figures
+
+ggplot2 objects are saved through `ggplot2::ggsave()`. Device-specific settings
+such as JPEG quality and TIFF compression are forwarded only to the relevant
+device.
+
+```r
+imagesave(
+  p,
+  name = "figure_ggplot",
+  outdir = file.path(tempdir(), "canton-figures"),
+  format = c("pdf", "png"),
+  width = 180,
+  height = 120,
+  units = "mm",
+  dpi = 300
+)
 ```
+
+### Saving the current base R plot
+
+Base R plotting functions generally draw immediately and do not return a
+reusable object equivalent to a ggplot. After drawing a base plot,
+`imagesave()` can capture the current device display list:
+
+```r
+plot(
+  mtcars$mpg,
+  mtcars$wt,
+  pch = 19,
+  xlab = "Fuel economy (mpg)",
+  ylab = "Weight (1000 lbs)"
+)
+abline(lm(wt ~ mpg, data = mtcars), col = "red", lwd = 2)
+
+imagesave(
+  name = "figure_base",
+  outdir = file.path(tempdir(), "canton-figures"),
+  format = c("png", "pdf"),
+  width = 7,
+  height = 5,
+  dpi = 300
+)
+```
+
+Current-plot capture is intended for the current R session. For scripts,
+pipelines, and non-interactive rendering, a plotting function is more robust
+because it can be executed separately on every output device:
+
+```r
+draw_base_figure <- function() {
+  plot(mtcars$mpg, mtcars$wt, pch = 19)
+  abline(lm(wt ~ mpg, data = mtcars), col = "red", lwd = 2)
+}
+
+imagesave(
+  draw_base_figure,
+  name = "figure_base_function",
+  outdir = file.path(tempdir(), "canton-figures"),
+  format = c("png", "pdf", "tiff"),
+  width = 7,
+  height = 5,
+  dpi = 300
+)
+```
+
+### Saving pheatmap figures
+
+`pheatmap::pheatmap()` invisibly returns a list that contains a `gtable`.
+Canton extracts this component and saves it as a grid object.
+
+```r
+if (requireNamespace("pheatmap", quietly = TRUE)) {
+  set.seed(1)
+  mat <- matrix(stats::rnorm(100), nrow = 10)
+
+  ph <- pheatmap::pheatmap(
+    mat,
+    main = "Expression heatmap",
+    silent = TRUE
+  )
+
+  imagesave(
+    ph,
+    name = "figure_heatmap",
+    outdir = file.path(tempdir(), "canton-figures"),
+    format = c("png", "pdf", "tiff"),
+    width = 7,
+    height = 7,
+    dpi = 300
+  )
+}
+```
+
+`pheatmap` is a suggested package, not a required dependency. Canton can be
+installed and used for other plot types without it.
+
+### Saving ComplexHeatmap figures
+
+ComplexHeatmap objects are not equivalent to `pheatmap` objects and do not
+contain a `$gtable` component. A `Heatmap` or `HeatmapList` is laid out and
+rendered by `ComplexHeatmap::draw()`. Canton opens each requested output device
+and calls that method directly.
+
+```r
+if (requireNamespace("ComplexHeatmap", quietly = TRUE)) {
+  set.seed(2)
+  mat <- matrix(stats::rnorm(100), nrow = 10)
+
+  ht <- ComplexHeatmap::Heatmap(
+    mat,
+    name = "z-score",
+    column_title = "ComplexHeatmap example"
+  )
+
+  imagesave(
+    ht,
+    name = "figure_complex_heatmap",
+    outdir = file.path(tempdir(), "canton-figures"),
+    format = c("png", "pdf", "tiff"),
+    width = 7,
+    height = 7,
+    dpi = 300
+  )
+}
+```
+
+The same interface also accepts a `HeatmapList`, including objects constructed
+with the ComplexHeatmap `+` operator. `ComplexHeatmap` is a suggested
+Bioconductor package; it is needed only when saving these object types.
+
+## Figure export presets
+
+`figure_preset()` supplies reusable starting points for common output layouts:
+
+```r
+figure_preset("publication")
+figure_preset("single_column")
+figure_preset("double_column")
+figure_preset("high_resolution")
+figure_preset("presentation")
+```
+
+For example:
+
+```r
+imagesave(
+  p,
+  name = "figure_single_column",
+  outdir = file.path(tempdir(), "canton-figures"),
+  preset = "single_column"
+)
+```
+
+Preset values can be customised:
+
+```r
+custom_preset <- figure_preset(
+  "publication",
+  format = c("pdf", "png"),
+  width = 6.5,
+  height = 4.5,
+  dpi = 600
+)
+
+imagesave(
+  p,
+  name = "figure_custom",
+  outdir = file.path(tempdir(), "canton-figures"),
+  preset = custom_preset
+)
+```
+
+Explicit arguments supplied to `imagesave()` override the corresponding preset
+values. Presets are convenience defaults, not permanent representations of any
+journal's author instructions. Users should always compare the selected values
+with the current requirements of the target journal.
+
+## Font configuration
+
+### Setting a plotting font
+
+`setfont()` first checks whether the requested family is available. When it is
+available, Canton:
+
+- updates the active ggplot2 theme;
+- updates the current base graphics device, when one is open;
+- installs a session hook for subsequent base plots;
+- records the family for later `imagesave()` calls; and
+- registers platform-specific mappings for macOS Quartz or Windows graphics
+  devices when required.
+
+```r
+setfont("Arial")
+```
+
+Arial is a proprietary font and is not distributed with Canton. Canton does
+not download or install it. If Arial is missing, the error message provides
+platform-specific instructions for installing a legally obtained copy. A
+portable fallback can be selected explicitly:
+
+```r
+setfont("Arial", fallback = "sans")
+```
+
+Font availability can be inspected without modifying graphics settings:
+
+```r
+fontcheck("Arial")
+fontcheck("sans", quiet = TRUE)
+
+head(fontlist(), 10)
+fontlist("Arial|Helvetica")
+```
+
+### Restoring previous settings
+
+The first call to `setfont()` stores the existing ggplot2 theme and Canton font
+option. These settings can be restored explicitly:
+
+```r
+setfont("sans", quiet = TRUE)
+
+# Create figures here
+
+resetfont()
+```
+
+All font configuration is limited to the current R session. Canton does not
+modify system font directories.
+
+### Fonts in PDF output
+
+The standard R PDF device supports only a limited set of font mappings. For a
+non-standard configured family, Canton uses the Quartz PDF device on macOS and
+a Cairo PDF device on supported Windows or Linux installations. If an
+appropriate device is unavailable, Canton stops with an informative error
+instead of silently substituting an unknown font.
+
+## A publication-oriented ggplot2 theme
+
+`theme_canton()` is based on `ggplot2::theme_classic()` and provides explicit
+defaults for text, axes, ticks, legends, facet strips, margins, and optional
+grid lines.
+
+```r
+p_publication <- ggplot(
+  mtcars,
+  aes(mpg, wt, colour = factor(cyl))
+) +
+  geom_point(size = 2.5) +
+  labs(
+    x = "Fuel economy (mpg)",
+    y = "Weight (1000 lbs)",
+    colour = "Cylinders"
+  ) +
+  theme_canton(
+    base_size = 10,
+    grid = "none",
+    legend_position = "right"
+  )
+```
+
+Grid options are `"none"`, `"major"`, and `"both"`. The font defaults to the
+family configured by `setfont()`, or to the portable `"sans"` alias.
+
+## Colour palettes and ggplot2 scales
+
+List available palettes:
+
+```r
+hue()
+```
+
+Palette matching is case-insensitive:
+
+```r
+colours <- hue("NPG")
+dark_colours <- hue("dark2")
+```
+
+Use Canton palettes directly with discrete ggplot2 scales:
+
+```r
+p_publication + scale_colour_canton_d("NPG")
+
+ggplot(mtcars, aes(factor(cyl), fill = factor(am))) +
+  geom_bar() +
+  scale_fill_canton_d("Dark2") +
+  theme_canton()
+```
+
+Continuous colour and fill scales are also available:
+
+```r
+ggplot(mtcars, aes(mpg, wt, colour = qsec)) +
+  geom_point(size = 2.5) +
+  scale_colour_canton_c("NPG") +
+  theme_canton(grid = "major")
+```
+
+Both British (`colour`) and American (`color`) spellings are exported for
+colour scales.
+
+## Choosing an output format
+
+| Format | Typical use | Important properties |
+|---|---|---|
+| PDF | manuscript submission, vector artwork, typesetting | text and vector lines scale without loss; embedded raster layers retain their own resolution |
+| TIFF | journal submission and print workflows | commonly requested at 300 or 600 DPI; files can be large |
+| PNG | reports, slides, web pages, line and text graphics | lossless raster format; supports transparent backgrounds on suitable devices |
+| JPEG | photographs and continuous-tone images | lossy compression; generally not preferred for sharp text or statistical line art |
+
+For raster output, physical size and DPI determine pixel dimensions. A
+7-inch-wide image at 300 DPI is 2100 pixels wide. DPI does not define the
+resolution of vector text and lines in a PDF, although raster content embedded
+inside the PDF still has a finite resolution.
+
+Example high-resolution TIFF output:
+
+```r
+imagesave(
+  p,
+  name = "figure_print",
+  outdir = file.path(tempdir(), "canton-figures"),
+  format = "tiff",
+  width = 7,
+  height = 5,
+  units = "in",
+  dpi = 600,
+  compression = "lzw"
+)
+```
+
+TIFF compression capabilities differ between graphics devices. Canton avoids
+passing unsupported compression arguments to the default macOS Quartz TIFF
+device.
+
+## Additional workflow helpers
+
+### Quiet package loading
+
+`using()` accepts bare names, strings, or character vectors. It suppresses
+package startup messages, returns a named logical vector, and reports packages
+that could not be loaded. It never installs missing packages.
+
+```r
+using(ggplot2, grid)
+
+packages <- c("ggplot2", "grid")
+loaded <- using(packages)
+loaded
+```
+
+### Directory management
+
+`mkdir()` creates directories recursively. Calling it again for an existing
+directory is silent and safe.
+
+```r
+figure_directory <- mkdir(
+  file.path(tempdir(), "canton-project", "figures")
+)
+figure_directory
+```
+
+`pwd()` returns the current working directory:
+
+```r
+pwd()
+```
+
+## Error handling and side effects
+
+Canton follows these principles:
+
+- unsupported plot classes, formats, dimensions, fonts, and paths fail with
+  informative errors;
+- graphics devices are closed even when drawing fails;
+- no package is automatically installed by `using()`;
+- no font is downloaded or installed by `setfont()`;
+- no files are written during package loading;
+- output directories are created only after an explicit saving or directory
+  request; and
+- global plotting changes occur only after an explicit `setfont()` call and can
+  be restored with `resetfont()`.
+
+## Testing and package scope
+
+The test suite covers:
+
+- single- and multi-format ggplot2 output;
+- current and recorded base graphics;
+- function-based rendering;
+- actual `pheatmap` output when the suggested package is available;
+- actual ComplexHeatmap `Heatmap` and `HeatmapList` output when the suggested
+  package is available;
+- figure presets and explicit argument overrides;
+- font configuration and restoration;
+- discrete and continuous ggplot2 scales;
+- palette validation;
+- package loading behaviour; and
+- recursive directory creation.
+
+The package is intentionally focused on figure creation and small supporting
+workflow helpers. It does not attempt to analyse scientific data, enforce a
+particular journal's changing submission policy, inspect manuscript content,
+or guarantee font embedding by third-party PDF software.
+
+## License
+
+GPL (>= 3)

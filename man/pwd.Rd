@@ -2,15 +2,15 @@
 % Please edit documentation in R/pwd.R
 \name{pwd}
 \alias{pwd}
-\title{Print Current Working Directory}
+\title{Return the current working directory}
 \usage{
 pwd()
 }
 \value{
-a string of current working directory
+A character scalar containing the current working directory.
 }
 \description{
-Print the full filename of the current working directory.
+Return the absolute path of the current working directory.
 }
 \examples{
 pwd()

@@ -1,33 +1,67 @@
-#' Load Multiple Packages Without Starting Messages at Once
+#' Load multiple packages quietly
 #'
-#' Load Multiple Packages Without Starting Messages at Once
+#' Attach one or more installed packages while suppressing startup messages.
+#' Package names may be supplied as bare names, strings, or character vectors.
 #'
-#' @param ... multiple package names without double quotation marks and seperated by comma
+#' @param ... Package names supplied as bare names, character strings, or
+#'   character vectors.
 #'
-#' @return nothing
+#' @return Invisibly, a named logical vector indicating which packages were
+#'   loaded successfully.
 #'
 #' @export
 #' @examples
-#' using(ggplot, magrittr)
+#' using(ggplot2)
+#' using(c("ggplot2", "grid"))
 using <- function(...) {
-    packages <- as.character(match.call(expand.dots = FALSE)[[2]])
-
-    if (length(packages) == 0) {
-        return(invisible())
+    expressions <- base::as.list(base::substitute(base::list(...)))[-1L]
+    if (base::length(expressions) == 0L) {
+        return(base::invisible(base::structure(logical(), names = character())))
     }
-    loaded <- sapply(packages, function(x) {
-        # Try to load package
-        if (suppressPackageStartupMessages(require(x, character.only = TRUE, quietly = TRUE))) {
-            return(TRUE)
+
+    calling_environment <- base::parent.frame()
+    packages <- base::unlist(base::lapply(expressions, function(expression) {
+        if (base::is.symbol(expression)) {
+            symbol <- base::as.character(expression)
+            if (base::exists(symbol, envir = calling_environment, inherits = TRUE)) {
+                value <- base::get(symbol, envir = calling_environment, inherits = TRUE)
+                if (base::is.character(value)) {
+                    return(value)
+                }
+            }
+            return(symbol)
         }
-        # Couldn't load
-        return(FALSE)
-    })
 
-    # Give a warning if some packags couldn't be loaded
-    if (!all(loaded)) {
-        failed <- packages[!loaded]
-        base::warning(crayon::cyan("\nFailed to load: ", base::paste(failed, collapse = ", ")))
+        value <- base::eval(expression, envir = calling_environment)
+        if (!base::is.character(value)) {
+            base::stop(
+                "Package specifications must be names or character vectors.",
+                call. = FALSE
+            )
+        }
+        value
+    }), use.names = FALSE)
+
+    if (base::length(packages) == 0L || base::anyNA(packages) ||
+        base::any(!base::nzchar(packages))) {
+        base::stop("Package names must not be empty or missing.", call. = FALSE)
     }
-    return(invisible(loaded))
+    packages <- base::unique(packages)
+
+    loaded <- base::vapply(packages, function(package) {
+        base::suppressPackageStartupMessages(
+            base::require(package, character.only = TRUE, quietly = TRUE)
+        )
+    }, logical(1))
+    base::names(loaded) <- packages
+
+    if (!base::all(loaded)) {
+        failed <- packages[!loaded]
+        base::warning(
+            "Failed to load: ",
+            base::paste(failed, collapse = ", "),
+            call. = FALSE
+        )
+    }
+    base::invisible(loaded)
 }

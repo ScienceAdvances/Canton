@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(using)
+library(Canton)
 
-test_check("using")
+test_check("Canton")

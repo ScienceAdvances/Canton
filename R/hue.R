@@ -1,32 +1,18 @@
-#' Return a palette
+#' Return a Canton colour palette
 #'
-#' Return a palette
+#' Return a named colour palette. Call `hue()` without a name to list the
+#' available palettes.
 #'
-#' @param name pallet name
-#' @return a vector of colors
+#' @param name Palette name. Matching is case-insensitive. If `NULL`, list the
+#'   available palette names.
+#' @return A character vector of colours, or invisibly a character vector of
+#'   available palette names when `name` is `NULL`.
 #'
 #' @export
 #' @examples
-#' hue(name = "NPG")
-#'
-# huec <- function(name) {
-#     base::switch(name,
-#         BrBG = c("#8C510A", "#F5F1E7", "#01665E"),
-#         PiYG = c("#C51B7D", "#F8F0F4", "#4D9221"),
-#         RdBu = c("#B2182B", "#F8EFE9", "#2166AC"),
-#         bl2rd = c("#0000FF", "#0CE2F2", "#FF0000"),
-#         gnbu = c("#084081", "#6AC1C8", "#F7FCF0"),
-#         matlab = c("#0000AA", "#A1FFDB", "#AA0000"),
-#         Gwr = c("#0000FF", "#ffffff", "#FF0000"),
-#         Bwr = c("#3399CC", "#ffffff", "#FF6666")
-#     )
-# }
-
-hue <- function(name = NULL) {
-    if (is.null(name)) {
-        message("avaliable colors\nClassic Vitality Retro Summer Funny Refresh Mystery Spring Science NPG Lancet NEJM JAMA Report1 Report2 GK")
-    } else {
-        base::switch(name,
+#' hue("NPG")
+#' hue("dark2")
+.canton_palettes <- base::list(
             Classic = c("#FF6A00", "#FFD11A", "#99A7FF", "#5FC6FF", "#ABDF67", "#56D6B6", "#80B3FF", "#C06CEB", "#FF6262", "#815293", "#FFCA80", "#FF9933", "#FF964A", "#FFCC00", "#A2AFFF", "#6CCBFF", "#ACEC58", "#49F7CC", "#A9CAFB", "#DB94FF", "#FF7F7F", "#AF67CA", "#FFB958", "#FF9831"),
             Vitality = c("#2E8AE6", "#36aee4", "#17D8E6", "#3DCC9C", "#8ADD7A", "#C0E673", "#FEDF66", "#FEB266", "#FA7D64", "#e7688f", "#b45fbb", "#717cdc", "#5CA3EA", "#7ACEF3", "#79EEF6", "#63DDB4", "#A6EC99", "#D2EC9D", "#FCEBA7", "#F9CA9B", "#FCA08D", "#F085A6", "#C880CE", "#939BDE"),
             Retro = c("#187679", "#E6382E", "#FFD119", "#C27F35", "#FE685F", "#887A81", "#CC525C", "#FA9A4B", "#44BBA4", "#A7A09F", "#5C9966", "#86BF8B", "#418E91", "#E7716A", "#F3D455", "#C78E4F", "#FE685F", "#A8959F", "#CC666E", "#FAB276", "#5BBDAA", "#BDB3B1", "#6DB97A", "#A0D6A5"),
@@ -43,7 +29,29 @@ hue <- function(name = NULL) {
             Report1 = c("#BF5A17", "#F0017F", "#386CB0", "#FDBF85", "#BEADD3", "#7FC97F", "#FA7F72", "#666666", "#B4B1B1", "#D8434F", "#A95597", "#AA949D", "#E1B6AD", "#A2BCAA", "#C7A978", "#B1746C", "#8C8A8A", "#C28665", "#CC5036", "#CE3F8A", "#7B7FA7", "#EFBB9A", "#B1B5BF", "#A7BA7B", "#D67A6F", "#787878", "#BE9B8A", "#E42F67", "#7D63A3", "#D4A992", "#D0B2C1", "#92C394", "#E29675", "#8C6D69", "#A09D9D", "#C27140", "#BF8C6B", "#F079B7", "#748EB0", "#FDDEC1", "#C9C0D3", "#A4C9A4", "#FABCB6", "#666666", "#B4B3B3", "#D88D93", "#A97FA0", "#AA9FA3", "#E1CCC7", "#AFBCB3"),
             Report2 = c("#FF6600", "#FFFF66", "#009966", "#FF6666", "#666600", "#CCFFCC", "#669933", "#339966", "#FFB637", "#9ACB68", "#A78A65", "#B26B39", "#9BAF69", "#99CA7E", "#52984E", "#B0893E", "#FFAC57", "#D3E587", "#7A9371", "#D88671", "#83894D", "#BEE4B4", "#6C9857", "#849262", "#FFE47A", "#77B27A", "#D49281", "#8C723C", "#BDD6A8", "#8BB16F", "#5A986A", "#D99353", "#FFB380", "#FFFFB3", "#4D9980", "#FFB3B3", "#666633", "#E6FFE6", "#809966", "#669980", "#FFDB9B", "#B3CB9A", "#A79986", "#B28F76", "#A5AF8C", "#B2CAA4", "#759873", "#B09C77", "#FFD6AB", "#DCE5B6"),
             Dark2 =c('#1B9E77', '#D95F02', '#7570B3', '#E7298A', '#66A61E', '#E6AB02', '#A6761D', '#666666'),
-            GK = c("#6699A1", "#A73D7C", "#1F3683", "#A6A6A6", "#F18D8D", "#E5BA88", "#86CEEB", "#59417F"),
+            GK = c("#6699A1", "#A73D7C", "#1F3683", "#A6A6A6", "#F18D8D", "#E5BA88", "#86CEEB", "#59417F")
+)
+
+hue <- function(name = NULL) {
+    available <- base::names(.canton_palettes)
+    if (base::is.null(name)) {
+        base::message(
+            "Available palettes:\n",
+            base::paste(available, collapse = " ")
+        )
+        return(base::invisible(available))
+    }
+
+    .imagesave_validate_scalar(name, "name", type = "character")
+    index <- base::match(base::tolower(name), base::tolower(available))
+    if (base::is.na(index)) {
+        base::stop(
+            "Unknown palette `", name, "`. Available palettes are: ",
+            base::paste(available, collapse = ", "),
+            ".",
+            call. = FALSE
         )
     }
+
+    base::unname(.canton_palettes[[index]])
 }
