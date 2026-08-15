@@ -2,7 +2,7 @@ Package: Canton
 Title: Unified Figure Export and Font Tools for Scientific Graphics
 Version: 0.0.7
 Authors@R:
-    person("Tim", "Holy", , "yehior@qq.com", role = c("aut", "cre"),
+    person("Tim", "Holy", , "timholy@sina.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2254-1871"))
 Description: Provides a unified interface for exporting figures created with
     base graphics, 'ggplot2', 'grid', 'pheatmap', and 'ComplexHeatmap' to PDF,
