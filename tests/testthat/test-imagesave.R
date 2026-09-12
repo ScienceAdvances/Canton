@@ -133,9 +133,9 @@ test_that("imagesave infers a format from the filename extension", {
 })
 
 test_that("imagesave rejects unsupported objects and formats", {
-    expect_error(imagesave(mtcars), "Unsupported plot object")
+    expect_error(imagesave(mtcars, outdir = tempdir()), "Unsupported plot object")
     expect_error(
-        imagesave(function() graphics::plot(1), format = "svg"),
+        imagesave(function() graphics::plot(1), outdir = tempdir(), format = "svg"),
         "Unsupported format"
     )
 })

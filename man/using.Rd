@@ -11,8 +11,8 @@ using(...)
 character vectors.}
 }
 \value{
-Invisibly, a named logical vector indicating which packages were loaded
-successfully.
+Invisibly, a named logical vector indicating which packages were
+loaded successfully.
 }
 \description{
 Attach one or more installed packages while suppressing startup messages.

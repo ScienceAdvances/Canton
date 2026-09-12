@@ -1,25 +1,26 @@
-#' Set the default plotting font
+#' Configure a font locally
 #'
-#' `setfont()` checks that a font family is available and applies it to the
-#' active ggplot2 theme, the current base graphics device, future base plots,
-#' and [imagesave()]. It does not download or install proprietary fonts.
+#' Without `code`, validate and return a font family without changing settings.
+#' With `code`, apply the font during evaluation and restore the previous
+#' options, ggplot2 theme, and existing device's font on exit, including errors.
+#' No graphics device is opened and no persistent plotting hook is installed.
+#' Print ggplot objects inside the block to render them with the temporary theme.
 #'
-#' Arial is proprietary and has no official standalone download. If it is not
-#' installed, `setfont()` reports platform-specific installation guidance.
-#'
-#' @param family Font family to use. Defaults to `"Arial"`.
-#' @param fallback Optional fallback family. If `family` is unavailable and
-#'   `fallback` is available, use it after issuing a warning. The aliases
-#'   `"sans"`, `"serif"`, and `"mono"` are always accepted.
-#' @param quiet Whether to suppress the success message.
-#'
-#' @return Invisibly, the font family that was configured.
+#' @param family Font family. Defaults to `"Arial"`.
+#' @param fallback Optional available fallback, used with a warning.
+#' @param quiet Suppress the status message.
+#' @param code Optional expression evaluated with temporary font settings.
+#'   For base graphics, open an explicit device before calling this function.
+#' @return Without `code`, invisibly the validated family; otherwise the
+#'   result of evaluating `code`.
 #' @export
-#'
 #' @examples
-#' setfont("sans", quiet = TRUE)
-#' resetfont(quiet = TRUE)
-setfont <- function(family = "Arial", fallback = NULL, quiet = FALSE) {
+#' family <- setfont("sans", quiet = TRUE)
+#' theme_canton(base_family = family)
+#' setfont("sans", quiet = TRUE, code = {
+#'   theme_canton()
+#' })
+setfont <- function(family = "Arial", fallback = NULL, quiet = FALSE, code) {
     .imagesave_validate_scalar(family, "family", type = "character")
     .imagesave_validate_scalar(quiet, "quiet", type = "logical")
     if (!base::nzchar(base::trimws(family))) {
@@ -53,40 +54,31 @@ setfont <- function(family = "Arial", fallback = NULL, quiet = FALSE) {
         family <- fallback
     }
 
-    if (base::is.null(base::getOption("Canton.previous_font_state", NULL))) {
-        base::options(Canton.previous_font_state = base::list(
-            family = base::getOption("Canton.font_family", NULL),
-            theme = ggplot2::theme_get()
-        ))
+
+    if (missing(code)) {
+        if (!quiet) base::message("Validated font family: ", family)
+        return(base::invisible(family))
     }
-
-    .canton_register_font(family)
-    base::options(Canton.font_family = family)
-
+    old_options <- base::options(Canton.font_family = family)
+    base::on.exit(base::options(old_options), add = TRUE)
+    old_theme <- ggplot2::theme_get()
+    base::on.exit(ggplot2::theme_set(old_theme), add = TRUE)
     ggplot2::theme_update(text = ggplot2::element_text(family = family))
-
-    if (!base::isTRUE(base::getOption("Canton.font_hook_registered"))) {
-        base::setHook(
-            "before.plot.new",
-            function() {
-                current_family <- base::getOption("Canton.font_family", NULL)
-                if (!base::is.null(current_family) && base::nzchar(current_family)) {
-                    base::try(graphics::par(family = current_family), silent = TRUE)
-                }
-            },
-            action = "append"
-        )
-        base::options(Canton.font_hook_registered = TRUE)
+    device <- grDevices::dev.cur()
+    if (device != 1L) {
+        old_family <- graphics::par("family")
+        base::on.exit({
+            if (device %in% grDevices::dev.list()) {
+                active <- grDevices::dev.cur()
+                grDevices::dev.set(device)
+                graphics::par(family = old_family)
+                if (active %in% grDevices::dev.list()) grDevices::dev.set(active)
+            }
+        }, add = TRUE)
+        graphics::par(family = family)
     }
-
-    if (grDevices::dev.cur() != 1L) {
-        base::try(graphics::par(family = family), silent = TRUE)
-    }
-
-    if (!quiet) {
-        base::message("Default plotting font set to: ", family)
-    }
-    base::invisible(family)
+    if (!quiet) base::message("Temporarily using font family: ", family)
+    base::eval(base::substitute(code), envir = base::parent.frame())
 }
 
 .canton_font_available <- function(family) {
@@ -100,50 +92,6 @@ setfont <- function(family = "Arial", fallback = NULL, quiet = FALSE) {
     families <- c(fonts$family, registered$family)
 
     base::tolower(family) %in% base::tolower(base::unique(families))
-}
-
-.canton_register_font <- function(family) {
-    if (base::tolower(family) %in% c("sans", "serif", "mono", "symbol", "emoji", "")) {
-        return(base::invisible(family))
-    }
-
-    platform <- base::Sys.info()[["sysname"]]
-    if (base::identical(platform, "Darwin")) {
-        font_rows <- systemfonts::system_fonts()
-        font_rows <- font_rows[base::tolower(font_rows$family) == base::tolower(family), ]
-        face_names <- .canton_quartz_faces(font_rows, family)
-        mapping <- base::structure(
-            base::list(grDevices::quartzFont(face_names)),
-            names = family
-        )
-        base::do.call(grDevices::quartzFonts, mapping)
-    } else if (base::identical(.Platform$OS.type, "windows")) {
-        mapping <- base::structure(
-            base::list(grDevices::windowsFont(family)),
-            names = family
-        )
-        base::do.call(grDevices::windowsFonts, mapping)
-    }
-
-    base::invisible(family)
-}
-
-.canton_quartz_faces <- function(font_rows, family) {
-    choose <- function(bold, italic) {
-        candidates <- font_rows[
-            font_rows$italic == italic & (font_rows$weight == "bold") == bold,
-        ]
-        if (base::nrow(candidates) < 1L) {
-            candidates <- font_rows
-        }
-        if (base::nrow(candidates) < 1L) family else candidates$name[[1L]]
-    }
-    c(
-        choose(FALSE, FALSE),
-        choose(TRUE, FALSE),
-        choose(FALSE, TRUE),
-        choose(TRUE, TRUE)
-    )
 }
 
 .canton_font_install_message <- function(family) {

@@ -4,8 +4,8 @@
 #' defaults suitable as a starting point for scientific figures.
 #'
 #' @param base_size Base font size in points.
-#' @param base_family Base font family. Defaults to the family configured by
-#'   [setfont()], or `"sans"` when no family has been configured.
+#' @param base_family Base font family. Defaults to the temporary family inside
+#'   a [setfont()] code block, or `"sans"` otherwise.
 #' @param grid Which panel grid lines to show: `"none"`, `"major"`, or
 #'   `"both"`.
 #' @param legend_position ggplot2 legend position.

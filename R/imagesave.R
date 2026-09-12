@@ -15,7 +15,8 @@
 #'   If `NULL`, capture the current plot.
 #' @param name Output filename stem. A supported extension in `name` is used
 #'   when `format` is omitted.
-#' @param outdir Output directory.
+#' @param outdir Required output directory. No files are written unless an
+#'   explicit, non-empty directory is supplied.
 #' @param format One or more of `"pdf"`, `"png"`, `"jpg"`, `"jpeg"`,
 #'   `"tif"`, or `"tiff"`.
 #' @param preset Optional built-in preset name or an object returned by
@@ -38,11 +39,11 @@
 #'   ggplot2::geom_point()
 #' imagesave(p, "scatter", outdir = tempdir(), format = c("png", "pdf"))
 #'
-#' plot(mtcars$mpg, mtcars$wt)
-#' imagesave(name = "base-plot", outdir = tempdir(), format = "png")
+#' imagesave(function() plot(mtcars$mpg, mtcars$wt),
+#'           name = "base-plot", outdir = tempdir(), format = "png")
 imagesave <- function(plot = NULL,
                       name = "plot",
-                      outdir = base::getwd(),
+                      outdir,
                       format = "pdf",
                       preset = NULL,
                       width = 9,
@@ -55,6 +56,9 @@ imagesave <- function(plot = NULL,
                       pointsize = 12,
                       family = base::getOption("Canton.font_family", NULL),
                       overwrite = TRUE) {
+    if (missing(outdir)) {
+        base::stop("Supply an explicit `outdir`.", call. = FALSE)
+    }
     format_missing <- missing(format)
     width_missing <- missing(width)
     height_missing <- missing(height)
@@ -80,6 +84,9 @@ imagesave <- function(plot = NULL,
 
     .imagesave_validate_scalar(name, "name", type = "character")
     .imagesave_validate_scalar(outdir, "outdir", type = "character")
+    if (!base::nzchar(base::trimws(outdir))) {
+        base::stop("`outdir` must not be empty.", call. = FALSE)
+    }
     .imagesave_validate_number(width, "width", lower = 0, strict = TRUE)
     .imagesave_validate_number(height, "height", lower = 0, strict = TRUE)
     .imagesave_validate_number(dpi, "dpi", lower = 0, strict = TRUE)
@@ -95,7 +102,6 @@ imagesave <- function(plot = NULL,
         if (!.canton_font_available(family)) {
             base::stop(.canton_font_install_message(family), call. = FALSE)
         }
-        .canton_register_font(family)
     }
 
     supported <- c("pdf", "png", "jpg", "jpeg", "tif", "tiff")
@@ -134,6 +140,7 @@ imagesave <- function(plot = NULL,
         base::stop("`name` must contain a filename stem.", call. = FALSE)
     }
 
+    plot_info <- .imagesave_prepare_plot(plot)
     if (!base::dir.exists(outdir) &&
         !base::dir.create(outdir, recursive = TRUE, showWarnings = FALSE)) {
         base::stop("Unable to create output directory: ", outdir, call. = FALSE)
@@ -159,7 +166,6 @@ imagesave <- function(plot = NULL,
         )
     }
 
-    plot_info <- .imagesave_prepare_plot(plot)
     for (i in base::seq_along(paths)) {
         if (plot_info$method == "ggsave") {
             .imagesave_ggsave(
@@ -391,6 +397,15 @@ imagesave <- function(plot = NULL,
     standard <- c("sans", "serif", "mono", "Helvetica", "Times", "Courier")
     platform <- base::Sys.info()[["sysname"]]
 
+    if (family %in% standard) {
+        return(grDevices::pdf)
+    }
+    if (base::isTRUE(base::capabilities("cairo"))) {
+        if (direct) {
+            return(function(file, ...) grDevices::cairo_pdf(filename = file, ...))
+        }
+        return(grDevices::cairo_pdf)
+    }
     if (base::identical(platform, "Darwin")) {
         if (direct) {
             return(function(file, ...) {
@@ -402,16 +417,6 @@ imagesave <- function(plot = NULL,
         })
     }
 
-    if (family %in% standard) {
-        return(grDevices::pdf)
-    }
-    if (base::isTRUE(base::capabilities("cairo"))) {
-        if (direct) {
-            return(function(file, ...) grDevices::cairo_pdf(filename = file, ...))
-        }
-        return(grDevices::cairo_pdf)
-    }
-
     base::stop(
         "Saving a PDF with font `", family,
         "` requires a Cairo-capable R graphics device on this system.",
@@ -420,8 +425,8 @@ imagesave <- function(plot = NULL,
 }
 
 .imagesave_validate_scalar <- function(x, name, type) {
-    valid <- base::length(x) == 1L && !base::is.na(x) &&
-        base::typeof(x) == type
+    valid <- base::typeof(x) == type && base::length(x) == 1L &&
+        !base::is.na(x)
     if (!valid) {
         base::stop("`", name, "` must be a single ", type, " value.", call. = FALSE)
     }

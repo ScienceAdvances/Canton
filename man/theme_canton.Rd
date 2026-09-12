@@ -14,8 +14,8 @@ theme_canton(
 \arguments{
 \item{base_size}{Base font size in points.}
 
-\item{base_family}{Base font family. Defaults to the family configured by
-\code{setfont()}, or \code{"sans"} when no family has been configured.}
+\item{base_family}{Base font family. Defaults to the temporary family inside
+a \code{\link[=setfont]{setfont()}} code block, or \code{"sans"} otherwise.}
 
 \item{grid}{Which panel grid lines to show: \code{"none"}, \code{"major"}, or
 \code{"both"}.}

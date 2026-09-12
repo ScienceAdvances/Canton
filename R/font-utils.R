@@ -41,7 +41,11 @@ fontcheck <- function(family = "Arial", error = FALSE, quiet = FALSE) {
     .imagesave_validate_scalar(family, "family", type = "character")
     .imagesave_validate_scalar(error, "error", type = "logical")
     .imagesave_validate_scalar(quiet, "quiet", type = "logical")
-    available <- .canton_font_available(base::trimws(family))
+    family <- base::trimws(family)
+    if (!base::nzchar(family)) {
+        base::stop("`family` must not be empty.", call. = FALSE)
+    }
+    available <- .canton_font_available(family)
 
     if (!available && error) {
         base::stop(.canton_font_install_message(family), call. = FALSE)
@@ -55,38 +59,17 @@ fontcheck <- function(family = "Arial", error = FALSE, quiet = FALSE) {
     available
 }
 
-#' Restore plotting font settings
+#' Compatibility helper for scoped font settings
 #'
-#' Restore the ggplot2 theme and default graphics family saved by the first
-#' call to [setfont()] in the current R session.
-#'
-#' @param quiet Whether to suppress the status message.
-#'
-#' @return Invisibly, `TRUE` when settings were restored and `FALSE` when no
-#'   saved settings were available.
+#' Font settings now restore automatically when the `code` block in
+#' [setfont()] exits. This compatibility helper does not modify user settings.
+#' @param quiet Suppress the status message.
+#' @return Invisibly, `FALSE`; no persistent settings need restoring.
 #' @export
-#'
 #' @examples
-#' setfont("sans", quiet = TRUE)
 #' resetfont(quiet = TRUE)
 resetfont <- function(quiet = FALSE) {
     .imagesave_validate_scalar(quiet, "quiet", type = "logical")
-    state <- base::getOption("Canton.previous_font_state", NULL)
-    if (base::is.null(state)) {
-        if (!quiet) base::message("No Canton font settings to restore.")
-        return(base::invisible(FALSE))
-    }
-
-    ggplot2::theme_set(state$theme)
-    base::options(
-        Canton.font_family = state$family,
-        Canton.previous_font_state = NULL
-    )
-    if (grDevices::dev.cur() != 1L) {
-        current_family <- if (base::is.null(state$family)) "" else state$family
-        base::try(graphics::par(family = current_family), silent = TRUE)
-    }
-
-    if (!quiet) base::message("Previous plotting font settings restored.")
-    base::invisible(TRUE)
+    if (!quiet) base::message("Font settings restore automatically after setfont(code = ...).")
+    base::invisible(FALSE)
 }

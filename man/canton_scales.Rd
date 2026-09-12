@@ -31,6 +31,6 @@ scale_fill_canton_c(palette = "NPG", ...)
 A ggplot2 scale object.
 }
 \description{
-Apply a palette returned by \code{hue()} to discrete or continuous ggplot2
+Apply a palette returned by \code{\link[=hue]{hue()}} to discrete or continuous ggplot2
 colour and fill scales.
 }

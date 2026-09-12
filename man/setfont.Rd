@@ -2,32 +2,35 @@
 % Please edit documentation in R/setfont.R
 \name{setfont}
 \alias{setfont}
-\title{Set the default plotting font}
+\title{Configure a font locally}
 \usage{
-setfont(family = "Arial", fallback = NULL, quiet = FALSE)
+setfont(family = "Arial", fallback = NULL, quiet = FALSE, code)
 }
 \arguments{
-\item{family}{Font family to use. Defaults to \code{"Arial"}.}
+\item{family}{Font family. Defaults to \code{"Arial"}.}
 
-\item{fallback}{Optional fallback family. If \code{family} is unavailable and
-\code{fallback} is available, use it after issuing a warning. The aliases
-\code{"sans"}, \code{"serif"}, and \code{"mono"} are always accepted.}
+\item{fallback}{Optional available fallback, used with a warning.}
 
-\item{quiet}{Whether to suppress the success message.}
+\item{quiet}{Suppress the status message.}
+
+\item{code}{Optional expression evaluated with temporary font settings.
+For base graphics, open an explicit device before calling this function.}
 }
 \value{
-Invisibly, the font family that was configured.
+Without \code{code}, invisibly the validated family; otherwise the
+result of evaluating \code{code}.
 }
 \description{
-\code{setfont()} checks that a font family is available and applies it to the
-active ggplot2 theme, the current base graphics device, future base plots, and
-\code{imagesave()}. It does not download or install proprietary fonts.
-}
-\details{
-Arial is proprietary and has no official standalone download. If it is not
-installed, \code{setfont()} reports platform-specific installation guidance.
+Without \code{code}, validate and return a font family without changing settings.
+With \code{code}, apply the font during evaluation and restore the previous
+options, ggplot2 theme, and existing device's font on exit, including errors.
+No graphics device is opened and no persistent plotting hook is installed.
+Print ggplot objects inside the block to render them with the temporary theme.
 }
 \examples{
-setfont("sans", quiet = TRUE)
-resetfont(quiet = TRUE)
+family <- setfont("sans", quiet = TRUE)
+theme_canton(base_family = family)
+setfont("sans", quiet = TRUE, code = {
+  theme_canton()
+})
 }

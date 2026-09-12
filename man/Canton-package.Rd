@@ -6,8 +6,25 @@
 \alias{Canton-package}
 \title{Canton: Helpers for Data Analysis and Graphics Workflows}
 \description{
-Canton provides focused helpers for saving plots, configuring plotting fonts,
-applying publication presets and themes, selecting colour palettes, loading
-packages, and managing analysis output directories.
+Canton provides focused helpers for saving plots, configuring plotting
+fonts, applying publication presets and themes, selecting colour palettes,
+loading packages, and managing analysis output directories.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/ScienceAdvances/Canton}
+  \item Report bugs at \url{https://github.com/ScienceAdvances/Canton/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Tim Holy \email{email@timholy.com}
+
+Authors:
+\itemize{
+  \item Tim Holy \email{email@timholy.com}
+}
+
 }
 \keyword{internal}

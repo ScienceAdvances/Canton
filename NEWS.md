@@ -1,3 +1,14 @@
+# Canton 0.0.8
+
+- Require an explicit, non-empty output directory in imagesave().
+- Validate unsupported plot objects before creating directories.
+- Make setfont() validation side-effect-free; code blocks apply temporary
+  settings restored on exit, including errors and nested calls.
+- Remove persistent font hooks and platform font registration.
+- Retain resetfont() as a documented compatibility no-op.
+- Add a verified reference for the ggplot2 graphics framework.
+- Add regression tests for state restoration and export failure handling.
+
 # Canton 0.0.7
 
 ## New features

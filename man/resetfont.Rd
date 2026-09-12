@@ -2,22 +2,20 @@
 % Please edit documentation in R/font-utils.R
 \name{resetfont}
 \alias{resetfont}
-\title{Restore plotting font settings}
+\title{Compatibility helper for scoped font settings}
 \usage{
 resetfont(quiet = FALSE)
 }
 \arguments{
-\item{quiet}{Whether to suppress the status message.}
+\item{quiet}{Suppress the status message.}
 }
 \value{
-Invisibly, \code{TRUE} when settings were restored and \code{FALSE} when no
-saved settings were available.
+Invisibly, \code{FALSE}; no persistent settings need restoring.
 }
 \description{
-Restore the ggplot2 theme and default graphics family saved by the first call
-to \code{setfont()} in the current R session.
+Font settings now restore automatically when the \code{code} block in
+\code{\link[=setfont]{setfont()}} exits. This compatibility helper does not modify user settings.
 }
 \examples{
-setfont("sans", quiet = TRUE)
 resetfont(quiet = TRUE)
 }

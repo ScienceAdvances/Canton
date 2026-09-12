@@ -1,23 +1,21 @@
-## Test environments
+## Resubmission: Canton 0.0.8
 
-* local macOS 26.6.1, R 4.6.1 (R-devel), aarch64
+- Added Wickham (2016, ISBN:978-3-319-24277-4) in DESCRIPTION for ggplot2.
+- imagesave() now requires an explicit non-empty outdir; mkdir() requires
+  an explicit directory. Examples/tests use temporary output paths.
+- setfont() validates without changing settings, or evaluates code with
+  temporary font settings restored by immediately registered on.exit()
+  handlers. Removed permanent hooks and platform font registration.
+- resetfont() is a documented compatibility no-op.
+- Updated documentation and regression tests.
 
-## R CMD check results
+## Checks (macOS arm64, R 4.6.1, 2026-09-12)
 
-Standard check, including tests, examples, and PDF manual:
-
-0 errors | 0 warnings | 0 notes
-
-`R CMD check --as-cran` produced two environment-only notes:
-
-* Pandoc is not installed locally, so `README.md` and `NEWS.md` could not be
-  checked by Pandoc.
-* The HTML Tidy executable available locally is not recent enough for HTML
-  validation.
-
-These notes concern local checking tools. Package installation, code,
-documentation, examples, tests, and the PDF manual completed successfully.
-
-## Submission
-
-* This is a new release.
+- R CMD check: Status: OK, including examples, tests and PDF manual.
+- Tests: 86 passed, 0 failed, 0 warnings, 0 skipped.
+- R CMD check --as-cran with _R_CHECK_CRAN_INCOMING_=false:
+  0 errors, 0 warnings, 1 NOTE (local HTML Tidy is too old).
+- Full online --as-cran completed: 0 errors, 0 warnings, 2 NOTEs.
+  The incoming NOTE reports a new submission and two GitHub URL connection
+  timeouts (libcurl code 28); the other NOTE concerns outdated local HTML Tidy.
+- Windows and Linux were not tested locally.

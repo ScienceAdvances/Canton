@@ -7,12 +7,12 @@
 hue(name = NULL)
 }
 \arguments{
-\item{name}{Palette name. Matching is case-insensitive. If \code{NULL}, list
-the available palette names.}
+\item{name}{Palette name. Matching is case-insensitive. If \code{NULL}, list the
+available palette names.}
 }
 \value{
-A character vector of colours, or invisibly a character vector of available
-palette names when \code{name} is \code{NULL}.
+A character vector of colours, or invisibly a character vector of
+available palette names when \code{name} is \code{NULL}.
 }
 \description{
 Return a named colour palette. Call \code{hue()} without a name to list the

@@ -17,7 +17,7 @@ fontcheck(family = "Arial", error = FALSE, quiet = FALSE)
 A logical scalar.
 }
 \description{
-Check whether a plotting font is available.
+Check whether a plotting font is available
 }
 \examples{
 fontcheck("sans", quiet = TRUE)

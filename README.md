@@ -28,10 +28,10 @@ explicitly calls a saving function and selects an output directory.
 |---|---|
 | `imagesave()` | Save supported R plots to one or more formats |
 | `figure_preset()` | Create reusable size, resolution, and format settings |
-| `setfont()` | Check and configure a plotting font for the current R session |
+| `setfont()` | Validate a font or apply it within a code block |
 | `fontcheck()` | Test whether a font family is available |
 | `fontlist()` | List or search available system font families |
-| `resetfont()` | Restore settings saved by the first `setfont()` call |
+| `resetfont()` | Compatibility helper; restoration is automatic |
 | `theme_canton()` | Apply a compact publication-oriented ggplot2 theme |
 | `scale_*_canton_d()` | Apply Canton palettes to discrete ggplot2 scales |
 | `scale_*_canton_c()` | Apply Canton palettes to continuous ggplot2 scales |
@@ -146,6 +146,8 @@ reusable object equivalent to a ggplot. After drawing a base plot,
 `imagesave()` can capture the current device display list:
 
 ```r
+grDevices::pdf(tempfile(fileext = ".pdf"))
+grDevices::dev.control("enable")
 plot(
   mtcars$mpg,
   mtcars$wt,
@@ -163,6 +165,7 @@ imagesave(
   height = 5,
   dpi = 300
 )
+grDevices::dev.off()
 ```
 
 Current-plot capture is intended for the current R session. For scripts,
@@ -300,64 +303,28 @@ with the current requirements of the target journal.
 
 ## Font configuration
 
-### Setting a plotting font
-
-`setfont()` first checks whether the requested family is available. When it is
-available, Canton:
-
-- updates the active ggplot2 theme;
-- updates the current base graphics device, when one is open;
-- installs a session hook for subsequent base plots;
-- records the family for later `imagesave()` calls; and
-- registers platform-specific mappings for macOS Quartz or Windows graphics
-  devices when required.
+Font validation leaves session settings unchanged:
 
 ```r
-setfont("Arial")
+family <- setfont("sans", quiet = TRUE)
+p <- p + theme_canton(base_family = family)
+imagesave(p, outdir = tempdir(), family = family)
 ```
 
-Arial is a proprietary font and is not distributed with Canton. Canton does
-not download or install it. If Arial is missing, the error message provides
-platform-specific instructions for installing a legally obtained copy. A
-portable fallback can be selected explicitly:
+Use a code block for temporary defaults. Settings restore automatically on
+normal return and errors. Print ggplot objects inside the block.
 
 ```r
-setfont("Arial", fallback = "sans")
+setfont("sans", code = {
+  print(p)
+  imagesave(p, outdir = tempdir())
+})
 ```
 
-Font availability can be inspected without modifying graphics settings:
-
-```r
-fontcheck("Arial")
-fontcheck("sans", quiet = TRUE)
-
-head(fontlist(), 10)
-fontlist("Arial|Helvetica")
-```
-
-### Restoring previous settings
-
-The first call to `setfont()` stores the existing ggplot2 theme and Canton font
-option. These settings can be restored explicitly:
-
-```r
-setfont("sans", quiet = TRUE)
-
-# Create figures here
-
-resetfont()
-```
-
-All font configuration is limited to the current R session. Canton does not
-modify system font directories.
-
-### Fonts in PDF output
-
-The standard R PDF device supports only a limited set of font mappings. For a
-non-standard configured family, Canton uses the Quartz PDF device on macOS and
-a Cairo PDF device on supported Windows or Linux installations. If an
-appropriate device is unavailable, Canton stops with an informative error
-instead of silently substituting an unknown font.
+For base plots, pass `family` to `imagesave()` and draw on its output device.
+No permanent graphics hooks or system font registrations are installed.
+`resetfont()` remains as a compatibility no-op because restoration is automatic.
+Use `fontcheck()` and `fontlist()` to inspect installed fonts.
 
 ## A publication-oriented ggplot2 theme
 
@@ -384,7 +351,7 @@ p_publication <- ggplot(
 ```
 
 Grid options are `"none"`, `"major"`, and `"both"`. The font defaults to the
-family configured by `setfont()`, or to the portable `"sans"` alias.
+family inside a `setfont(code = ...)` block, or to the portable `"sans"` alias.
 
 ## Colour palettes and ggplot2 scales
 
@@ -504,8 +471,7 @@ Canton follows these principles:
 - no files are written during package loading;
 - output directories are created only after an explicit saving or directory
   request; and
-- global plotting changes occur only after an explicit `setfont()` call and can
-  be restored with `resetfont()`.
+- temporary font settings in `setfont(code = ...)` restore automatically on exit.
 
 ## Testing and package scope
 

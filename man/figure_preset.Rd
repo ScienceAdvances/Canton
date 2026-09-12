@@ -19,18 +19,16 @@ figure_preset(
 )
 }
 \arguments{
-\item{name}{Built-in preset name: \code{"publication"},
-\code{"single_column"}, \code{"double_column"}, \code{"high_resolution"},
-or \code{"presentation"}.}
+\item{name}{Built-in preset name: \code{"publication"}, \code{"single_column"},
+\code{"double_column"}, \code{"high_resolution"}, or \code{"presentation"}.}
 
-\item{format, width, height, units, dpi, bg, quality, compression, pointsize}{Optional
-values that override the built-in preset.}
+\item{format, width, height, units, dpi, bg, quality, compression, pointsize}{Optional values that override the built-in preset.}
 }
 \value{
 An object of class \code{canton_figure_preset}.
 }
 \description{
-Create reusable dimensions and output settings for \code{imagesave()}. Presets
+Create reusable dimensions and output settings for \code{\link[=imagesave]{imagesave()}}. Presets
 are starting points rather than journal-specific guarantees; always compare
 them with the current author instructions for the target journal.
 }

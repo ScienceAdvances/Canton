@@ -7,7 +7,7 @@
 imagesave(
   plot = NULL,
   name = "plot",
-  outdir = base::getwd(),
+  outdir,
   format = "pdf",
   preset = NULL,
   width = 9,
@@ -24,26 +24,25 @@ imagesave(
 }
 \arguments{
 \item{plot}{A plot object or a zero-argument function that draws a plot.
-Supported objects include \code{ggplot}, \code{pheatmap}, ComplexHeatmap
-\code{Heatmap} and \code{HeatmapList} objects, \code{grob}/\code{gtable},
-\code{recordedplot}, and \code{trellis}. If \code{NULL}, capture the current
-plot.}
+Supported objects include \code{ggplot}, \code{pheatmap}, ComplexHeatmap \code{Heatmap}
+and \code{HeatmapList} objects, \code{grob}/\code{gtable}, \code{recordedplot}, and \code{trellis}.
+If \code{NULL}, capture the current plot.}
 
 \item{name}{Output filename stem. A supported extension in \code{name} is used
 when \code{format} is omitted.}
 
-\item{outdir}{Output directory.}
+\item{outdir}{Required output directory. No files are written unless an
+explicit, non-empty directory is supplied.}
 
-\item{format}{One or more of \code{"pdf"}, \code{"png"}, \code{"jpg"},
-\code{"jpeg"}, \code{"tif"}, or \code{"tiff"}.}
+\item{format}{One or more of \code{"pdf"}, \code{"png"}, \code{"jpg"}, \code{"jpeg"},
+\code{"tif"}, or \code{"tiff"}.}
 
 \item{preset}{Optional built-in preset name or an object returned by
-\code{figure_preset()}. Explicitly supplied arguments override preset values.}
+\code{\link[=figure_preset]{figure_preset()}}. Explicitly supplied arguments override preset values.}
 
 \item{width, height}{Plot dimensions.}
 
-\item{units}{Units for \code{width} and \code{height}: \code{"in"},
-\code{"cm"}, or \code{"mm"}.}
+\item{units}{Units for \code{width} and \code{height}: \code{"in"}, \code{"cm"}, or \code{"mm"}.}
 
 \item{dpi}{Resolution for raster formats.}
 
@@ -63,21 +62,21 @@ when \code{format} is omitted.}
 Invisibly, a named character vector containing the output paths.
 }
 \description{
-\code{imagesave()} saves ggplot2 plots, pheatmap and ComplexHeatmap objects,
-grid graphical objects, recorded base R plots, lattice plots, and plotting
+\code{imagesave()} saves ggplot2 plots, pheatmap and ComplexHeatmap objects, grid
+graphical objects, recorded base R plots, lattice plots, and plotting
 functions. When \code{plot} is \code{NULL}, the current plot is captured with
-\code{grDevices::recordPlot()}.
+\code{\link[grDevices:recordPlot]{grDevices::recordPlot()}}.
 }
 \details{
-ggplot2 and grid-based objects are saved with \code{ggplot2::ggsave()}.
-Recorded plots and plotting functions are redrawn on a format-specific
-graphics device.
+ggplot2 and grid-based objects are saved with \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}. Recorded
+plots and plotting functions are redrawn on a format-specific graphics
+device.
 }
 \examples{
 p <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, wt)) +
   ggplot2::geom_point()
 imagesave(p, "scatter", outdir = tempdir(), format = c("png", "pdf"))
 
-plot(mtcars$mpg, mtcars$wt)
-imagesave(name = "base-plot", outdir = tempdir(), format = "png")
+imagesave(function() plot(mtcars$mpg, mtcars$wt),
+          name = "base-plot", outdir = tempdir(), format = "png")
 }

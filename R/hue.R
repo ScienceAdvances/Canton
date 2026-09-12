@@ -1,17 +1,3 @@
-#' Return a Canton colour palette
-#'
-#' Return a named colour palette. Call `hue()` without a name to list the
-#' available palettes.
-#'
-#' @param name Palette name. Matching is case-insensitive. If `NULL`, list the
-#'   available palette names.
-#' @return A character vector of colours, or invisibly a character vector of
-#'   available palette names when `name` is `NULL`.
-#'
-#' @export
-#' @examples
-#' hue("NPG")
-#' hue("dark2")
 .canton_palettes <- base::list(
             Classic = c("#FF6A00", "#FFD11A", "#99A7FF", "#5FC6FF", "#ABDF67", "#56D6B6", "#80B3FF", "#C06CEB", "#FF6262", "#815293", "#FFCA80", "#FF9933", "#FF964A", "#FFCC00", "#A2AFFF", "#6CCBFF", "#ACEC58", "#49F7CC", "#A9CAFB", "#DB94FF", "#FF7F7F", "#AF67CA", "#FFB958", "#FF9831"),
             Vitality = c("#2E8AE6", "#36aee4", "#17D8E6", "#3DCC9C", "#8ADD7A", "#C0E673", "#FEDF66", "#FEB266", "#FA7D64", "#e7688f", "#b45fbb", "#717cdc", "#5CA3EA", "#7ACEF3", "#79EEF6", "#63DDB4", "#A6EC99", "#D2EC9D", "#FCEBA7", "#F9CA9B", "#FCA08D", "#F085A6", "#C880CE", "#939BDE"),
@@ -32,6 +18,20 @@
             GK = c("#6699A1", "#A73D7C", "#1F3683", "#A6A6A6", "#F18D8D", "#E5BA88", "#86CEEB", "#59417F")
 )
 
+#' Return a Canton colour palette
+#'
+#' Return a named colour palette. Call `hue()` without a name to list the
+#' available palettes.
+#'
+#' @param name Palette name. Matching is case-insensitive. If `NULL`, list the
+#'   available palette names.
+#' @return A character vector of colours, or invisibly a character vector of
+#'   available palette names when `name` is `NULL`.
+#'
+#' @export
+#' @examples
+#' hue("NPG")
+#' hue("dark2")
 hue <- function(name = NULL) {
     available <- base::names(.canton_palettes)
     if (base::is.null(name)) {

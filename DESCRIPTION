@@ -1,29 +1,28 @@
 Package: Canton
-Title: Unified Figure Export and Font Tools for Scientific Graphics
-Version: 0.0.7
+Title: Consistent Fonts and Figure Export for Scientific Publication Workflows
+Version: 0.0.8
 Authors@R:
-    person("Tim", "Holy", , "timholy@sina.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-2254-1871"))
+    person("Tim", "Holy", , "email@timholy.com", role = c("aut", "cre"))
 Description: Provides a unified interface for exporting figures created with
     base graphics, 'ggplot2', 'grid', 'pheatmap', and 'ComplexHeatmap' to PDF,
-    PNG, JPEG, and TIFF files. It selects a rendering strategy according to the
-    plot-object type and can export one figure to multiple formats in a single
-    call. Additional tools provide checked, session-level font configuration,
-    reusable figure presets, publication-oriented themes, colour palettes,
-    font diagnostics, quiet package loading, and directory management.
+    PNG, JPEG, and TIFF files. Selects an appropriate rendering strategy based
+    on the plot object and supports exporting a figure to multiple formats in
+    one call. Also provides font configuration and diagnostics, reusable figure
+    presets, publication-oriented themes, and colour palettes. The 'ggplot2'
+    graphics framework is described by Wickham (2016, ISBN:978-3-319-24277-4).
 License: GPL (>= 3)
 URL: https://github.com/ScienceAdvances/Canton
 BugReports: https://github.com/ScienceAdvances/Canton/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-Depends: R (>= 3.5)
+Depends:
+    R (>= 3.5)
 Imports:
     ggplot2 (>= 3.4.0),
     systemfonts
-Suggests: 
+Suggests:
     ComplexHeatmap,
     pheatmap,
     testthat (>= 3.0.0)
-Additional_repositories: https://bioconductor.org/packages/release/bioc
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0
