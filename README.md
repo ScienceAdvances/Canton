@@ -1,6 +1,10 @@
+[![CRAN Version](https://www.r-pkg.org/badges/version/Canton)](https://cran.r-project.org/package=Canton)
+[![CRAN Downloads](https://cranlogs.r-pkg.org/badges/Canton)](https://cran.r-project.org/package=Canton)
+
 # Canton
 
 > Consistent fonts and figure export for scientific publication workflows in R
+
 
 ## Overview
 
@@ -45,8 +49,7 @@ explicitly calls a saving function and selects an output directory.
 Install the development version from GitHub:
 
 ```r
-install.packages("remotes")
-remotes::install_github("ScienceAdvances/Canton")
+install.packages("Canton")
 ```
 
 Load the package:
