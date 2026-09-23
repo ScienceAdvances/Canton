@@ -46,10 +46,17 @@ explicitly calls a saving function and selects an output directory.
 
 ## Installation
 
-Install the development version from GitHub:
+Install from CRAN:
 
 ```r
 install.packages("Canton")
+```
+
+Install the development version from GitHub:
+
+```r
+install.packages("remotes")
+remotes::install_github("ScienceAdvances/Canton")
 ```
 
 Load the package:
